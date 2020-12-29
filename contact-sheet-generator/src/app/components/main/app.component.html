@@ -1,0 +1,32 @@
+<!-- File Selector -->
+<div class="file-uploader" *ngIf="pages.length === 0">
+  <div class="uploader-btn">
+    <input hidden multiple type="file" #uploader (change)="onFileSected($event)" />
+
+    <div (click)="uploader.click()"><i class="fa fa-plus-circle fa-5x" aria-hidden="true"></i></div>
+  </div>
+</div>
+
+<!-- Contact Sheet Layout -->
+<div *ngIf="pages.length > 0">
+  <!-- Reset Button -->
+  <div class="tool-bar">
+    <div class="button-item" (click)="print()"><i class="fa fa-print fa-2x" aria-hidden="true"></i></div>
+    <div class="button-item" (click)="reset()"><i class="fa fa-refresh fa-2x" aria-hidden="true"></i></div>
+  </div>
+  <div *ngFor="let page of pages" class="sheet">
+    <div class="strip">
+      <div class="frame-holder" *ngFor="let frame of page">
+        <!-- Normal orinetation -->
+        <img id="{{frame.id}}" *ngIf="!frame.shouldRotate" #frames class="frame" [src]="frame.url"/>
+        <!-- Rotated Orientation -->
+        <div *ngIf="frame.shouldRotate" class="rotation-wrapper-outer">
+          <div class="rotation-wrapper-inner" (click)="frame.flip = !frame.flip">
+            <img id="{{frame.id}}" class="frame element-to-rotate" [src]="frame.url" [class.invert-rotation]="frame.flip"/>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="break-after:page"></div>
+  </div>
+</div>
