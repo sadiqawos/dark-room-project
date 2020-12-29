@@ -1,2 +1,2 @@
 # The Dark Room Project
-A collection of tools merging Analog and Digital photography workflows
+A collection of tools for Analog and Digital photography workflows
