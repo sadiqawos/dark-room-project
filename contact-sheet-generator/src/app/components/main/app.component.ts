@@ -26,10 +26,10 @@ export class AppComponent {
 
   constructor() { }
 
-  onFileSelected($event: any): void {
+  async onFileSelected($event: any) {
     this.reset();
     for (let file of $event.target.files) {
-      this.getFrame(file).then(frame => this.addFrameToPage(frame));
+      await this.getFrame(file).then(frame => this.addFrameToPage(frame));
     }
   }
 
