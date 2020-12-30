@@ -26,15 +26,14 @@ export class AppComponent {
 
   constructor() { }
 
-  async onFileSelected($event: any) {
+  onFileSelected($event: any): void {
     this.reset();
     for (let file of $event.target.files) {
-      let frame = await this.processFile(file);
-      this.addFrameToPage(frame);
+      this.getFrame(file).then(frame => this.addFrameToPage(frame));
     }
   }
 
-  addFrameToPage(frame: Frame) {
+  addFrameToPage(frame: Frame): void {
     if (!frame || !frame.url) {
       return;
     }
@@ -47,7 +46,7 @@ export class AppComponent {
     this.pages[this.pages.length - 1].push(frame);
   }
 
-  processFile(file: any): Promise<Frame> {
+  getFrame(file: any): Promise<Frame> {
     return new Promise((resolve) => {
       let mimeType = file.type;
       let isValidImage = !(mimeType.match(/image\/*/) == null);
@@ -74,8 +73,9 @@ export class AppComponent {
   /**
    * Detect orientation after loading image in view. adjust to landscape if necessary
    * @param imgRef
+   * @param frame
    */
-  onImageLoad(imgRef: HTMLImageElement, frame: Frame) {
+  onImageLoad(imgRef: HTMLImageElement, frame: Frame): void {
     if (imgRef && frame && this.isPortrait(imgRef)) {
       frame.shouldRotate = true;
     }
@@ -86,11 +86,11 @@ export class AppComponent {
     return h > w;
   }
 
-  print() {
+  print(): void {
 
   }
 
-  reset() {
+  reset(): void {
     this.pages.length = 0;
   }
 }
