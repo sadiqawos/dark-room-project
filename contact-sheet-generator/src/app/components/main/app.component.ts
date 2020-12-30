@@ -1,13 +1,11 @@
-import { Component, OnInit, ViewChildren, QueryList } from '@angular/core';
+import { Component } from '@angular/core';
 
 class Frame {
-  public id: String;
   public url: String;
   public shouldRotate: boolean;
   public flip: boolean;
 
-  constructor(id: String, url: String, shouldRotate: boolean = false, flip: boolean = false) {
-    this.id = id;
+  constructor(url: String, shouldRotate: boolean = false, flip: boolean = false) {
     this.url = url;
     this.shouldRotate = shouldRotate;
     this.flip = flip;
@@ -19,78 +17,68 @@ class Frame {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.less']
 })
-export class AppComponent implements OnInit {
-  framesHash: Map<String, Frame> = new Map();
-  files: Array<any> = [];
+export class AppComponent {
   pages: Array<Array<Frame>> = [];
 
   framePerPage: number = 28;
   framesPerRow: number = 5;
   reader: FileReader = new FileReader();
-  @ViewChildren('frames') framesDiv?: QueryList<any>;
 
   constructor() { }
 
-  ngOnInit(): void {
-    this.reader.onload = (_event) => this.onFileLoaded();
-  }
-
-  onFileLoaded() {
-    let url: String;
-    if (this.reader.result) {
-      url = this.reader.result.toString();
-    } else {
-      return;
-    }
-
-    let id = `frame_${this.framesHash.size + 1}`;
-    let frame: Frame = new Frame(id, url);
-    this.framesHash.set(id, frame);
-    this.addFrameToPage(frame);
-    this.fixOrientation(id);
-    this.processNextImage();
-  }
-
-  onFileSected($event: any) {
+  async onFileSelected($event: any) {
     this.reset();
-    this.files.push(...$event.target.files);
-    this.processNextImage();
+    for (let file of $event.target.files) {
+      let frame = await this.processFile(file);
+      this.addFrameToPage(frame);
+    }
   }
 
   addFrameToPage(frame: Frame) {
-    if (this.pages.length === 0 || this.pages[this.pages.length - 1].length >= this.framePerPage) {
+    if (!frame || !frame.url) {
+      return;
+    }
+    let noPages = this.pages.length === 0;
+    let isEndOfCurrentPage = !noPages && this.pages[this.pages.length - 1].length >= this.framePerPage;
+
+    if (noPages || isEndOfCurrentPage) {
       this.pages.push([]);
     }
     this.pages[this.pages.length - 1].push(frame);
   }
 
-  processNextImage() {
-    if (this.files.length == 0) {
-      return;
-    }
-    let file = this.files.shift();
-    let mimeType = file.type;
-    let isValidImage = !(mimeType.match(/image\/*/) == null);
+  processFile(file: any): Promise<Frame> {
+    return new Promise((resolve) => {
+      let mimeType = file.type;
+      let isValidImage = !(mimeType.match(/image\/*/) == null);
 
-    if (!isValidImage) {
-      this.processNextImage();
-      return;
-    }
+      if (!isValidImage) {
+        resolve(undefined);
+      }
 
-    this.reader.readAsDataURL(file);
+      this.reader.onload = (_event) => {
+        let url: String;
+        if (this.reader.result) {
+          url = this.reader.result.toString();
+        } else {
+          return resolve(undefined);
+        }
+
+        resolve(new Frame(url));
+      };
+
+      this.reader.readAsDataURL(file);
+    });
   }
 
-  fixOrientation(elementId: string) {
-    // The timeout ensures that the image has been rendered
-    setTimeout(() => {
-      let img = <HTMLImageElement>document.getElementById(elementId);
-      if (this.isPortrait(img)) {
-        let frame = this.framesHash.get(elementId);
-        if (frame) {
-          frame.shouldRotate = true;
-        }
-      }
-    }, 500);
+  /**
+   * Detect orientation after loading image in view. adjust to landscape if necessary
+   * @param imgRef
+   */
+  onImageLoad(imgRef: HTMLImageElement, frame: Frame) {
+    if (imgRef && frame && this.isPortrait(imgRef)) {
+      frame.shouldRotate = true;
+    }
   }
 
   isPortrait(img: HTMLImageElement): boolean {
@@ -104,7 +92,5 @@ export class AppComponent implements OnInit {
 
   reset() {
     this.pages.length = 0;
-    this.files.length = 0;
-    this.framesHash = new Map();
   }
 }

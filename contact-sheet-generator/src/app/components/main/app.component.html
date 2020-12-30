@@ -1,7 +1,7 @@
 <!-- File Selector -->
 <div class="file-uploader" *ngIf="pages.length === 0">
   <div class="uploader-btn">
-    <input hidden multiple type="file" #uploader (change)="onFileSected($event)" />
+    <input hidden multiple type="file" #uploader (change)="onFileSelected($event)" />
 
     <div (click)="uploader.click()"><i class="fa fa-plus-circle fa-5x" aria-hidden="true"></i></div>
   </div>
@@ -18,11 +18,11 @@
     <div class="strip">
       <div class="frame-holder" *ngFor="let frame of page">
         <!-- Normal orinetation -->
-        <img id="{{frame.id}}" *ngIf="!frame.shouldRotate" #frames class="frame" [src]="frame.url"/>
+        <img *ngIf="!frame.shouldRotate" #frameRef class="frame" [src]="frame.url" (load)="onImageLoad(frameRef, frame)"/>
         <!-- Rotated Orientation -->
         <div *ngIf="frame.shouldRotate" class="rotation-wrapper-outer">
           <div class="rotation-wrapper-inner" (click)="frame.flip = !frame.flip">
-            <img id="{{frame.id}}" class="frame element-to-rotate" [src]="frame.url" [class.invert-rotation]="frame.flip"/>
+            <img class="frame element-to-rotate" [src]="frame.url" [class.invert-rotation]="frame.flip"/>
           </div>
         </div>
       </div>
