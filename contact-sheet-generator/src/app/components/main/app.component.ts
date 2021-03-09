@@ -12,6 +12,16 @@ class Frame {
   }
 }
 
+class FilmStock {
+  public name: String;
+  public iso: number;
+
+  constructor(name: String, iso: number) {
+    this.name = name;
+    this.iso = iso;
+  }
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -19,9 +29,19 @@ class Frame {
 })
 export class AppComponent {
   pages: Array<Array<Frame>> = [];
+  filmStocks: Array<FilmStock> = [
+    new FilmStock('Portra', 400),
+    new FilmStock('Portra', 800),
+    new FilmStock('Gold', 200),
+    new FilmStock('HP5', 400),
+    new FilmStock('Delta', 3200),
+  ];
+  selectedFilmStock: FilmStock = this.filmStocks[0];
 
   framePerPage: number = 28;
   framesPerRow: number = 5;
+  showSprocket: boolean = true;
+  showFilmBorder: boolean = true;
   reader: FileReader = new FileReader();
 
   constructor() { }

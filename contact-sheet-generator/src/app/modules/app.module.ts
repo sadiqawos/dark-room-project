@@ -6,11 +6,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ConfirmDialogComponent } from '../components/confirm-dialog/confirm-dialog.component';
 import {MatDialogModule} from '@angular/material/dialog';
+import { ConfirmDirective } from '../directives/confirm.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ConfirmDialogComponent
+    ConfirmDialogComponent,
+    ConfirmDirective
   ],
   imports: [
     BrowserModule,
